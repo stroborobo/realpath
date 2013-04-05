@@ -9,7 +9,10 @@ import (
 
 func main() {
 	var quiet bool
+	var dontResolveSymlinks bool
+
 	flag.BoolVar(&quiet, "q", false, "warnings will not be printed")
+	flag.BoolVar(&dontResolveSymlinks, "s", false, "do not resolve symlink")
 
 	flag.Parse()
 
@@ -21,12 +24,14 @@ func main() {
 			}
 			continue
 		}
-		s, err = filepath.EvalSymlinks(s)
-		if err != nil {
-			if !quiet {
-				fmt.Fprintln(os.Stderr, err)
+		if !dontResolveSymlinks {
+			s, err = filepath.EvalSymlinks(s)
+			if err != nil {
+				if !quiet {
+					fmt.Fprintln(os.Stderr, err)
+				}
+				continue
 			}
-			continue
 		}
 		fmt.Println(s)
 	}
